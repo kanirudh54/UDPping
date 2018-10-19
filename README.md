@@ -62,7 +62,8 @@ root@raspberrypi:~# ./udpping.py
  options:
    LEN         the length of payload, unit:byte
    INTERVAL    the seconds waited between sending each packet, as well as the timeout for reply packet, unit: ms
-
+   N           the number of packets to ping
+   PATTERN     You may specify up to ``pad'' bytes to fill out the packet you send.  This is useful for diagnosing data-dependent problems in a network
  examples:
    ./udpping 44.55.66.77 4000
    ./udpping 44.55.66.77 4000 "LEN=400;INTERVAL=2000"

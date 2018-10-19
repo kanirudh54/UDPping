@@ -15,15 +15,18 @@ INTERVAL = 1000  #unit ms
 LEN =64
 IP=""
 PORT=0
-
+N = 99999999
+PATTERN = None
 count=0
 count_of_received=0
 rtt_sum=0.0
 rtt_min=99999999.0
 rtt_max=0.0
+max_count = 0
+pattern = ''
 
 def signal_handler(signal, frame):
-	if count!=0 and count_of_received!=0:
+    	if count!=0 and count_of_received!=0:
 		print('')
 		print('--- ping statistics ---')
 	if count!=0:
@@ -33,7 +36,9 @@ def signal_handler(signal, frame):
 	os._exit(0)
 
 def random_string(length):
-        return ''.join(random.choice(string.ascii_letters+ string.digits ) for m in range(length))
+        global pattern
+        size_patern = len(pattern)
+        return str(pattern) + ''.join(random.choice(string.ascii_letters+ string.digits ) for m in range(length-size_patern))
 
 if len(sys.argv) != 3 and len(sys.argv)!=4 :
 	print(""" usage:""")
@@ -44,11 +49,15 @@ if len(sys.argv) != 3 and len(sys.argv)!=4 :
 	print(""" options:""")
 	print("""   LEN         the length of payload, unit:byte""")
 	print("""   INTERVAL    the seconds waited between sending each packet, as well as the timeout for reply packet, unit: ms""")
+	print("""   N           the number of packets to ping""") # Added feature
+	print("""   PATTERN     You may specify up to ``pad'' bytes to fill out the packet you send.  This is useful for diagnosing data-dependent problems in a network """) # Added feature
 
 	print()
 	print(" examples:")
 	print("   ./udpping 44.55.66.77 4000")
 	print('   ./udpping 44.55.66.77 4000 "LEN=400;INTERVAL=2000"')
+	print('   ./udpping 44.55.66.77 4000 "N=3"')
+	print('   ./udpping 44.55.66.77 4000 "PATTERN=1111111111111111"')
 	print("   ./udpping fe80::5400:ff:aabb:ccdd 4000")
 	print()
 
@@ -71,6 +80,12 @@ if LEN<5:
 if INTERVAL<50:
 	print("INTERVAL must be >=50")
 	exit()
+if N<=0:
+        print("N must be > 0")
+
+if PATTERN is not None:
+        #global pattern
+        pattern = str(PATTERN)
 
 signal.signal(signal.SIGINT, signal_handler)
 
@@ -81,7 +96,7 @@ else:
 
 print("UDPping %s via port %d with %d bytes of payload"% (IP,PORT,LEN))
 
-while True:
+while True and count < N:
 	payload= random_string(LEN)
 	sock.sendto(payload.encode(), (IP, PORT))
 	time_of_send=time.time()
@@ -119,3 +134,13 @@ while True:
 	if(time_remaining>0):
 		time.sleep(time_remaining)
 
+if count == N:
+     	if count!=0 and count_of_received!=0:
+		print('')
+		print('--- ping statistics ---')
+	if count!=0:
+		print('%d packets transmitted, %d received, %.2f%% packet loss'%(count,count_of_received, (count-count_of_received)*100.0/count))
+	if count_of_received!=0:
+		print('rtt min/avg/max = %.2f/%.2f/%.2f ms'%(rtt_min,rtt_sum/count_of_received,rtt_max))
+	os._exit(0)
+   
