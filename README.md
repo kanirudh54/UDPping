@@ -65,8 +65,9 @@ root@raspberrypi:~# ./udpping.py
    N           the number of packets to ping
    PATTERN     You may specify up to ``pad'' bytes to fill out the packet you send.  This is useful for diagnosing data-dependent problems in a network
  examples:
-   ./udpping 44.55.66.77 4000
-   ./udpping 44.55.66.77 4000 "LEN=400;INTERVAL=2000"
+   ./udpping 127.0.0.1 4000
+   ./udpping 127.0.0.1 4000 "LEN=400;INTERVAL=2000"
    ./udpping fe80::5400:ff:aabb:ccdd 4000
-   
+   ./udpping 127.0.0.1 4000 "N=3"'
+   ./udpping 127.0.0.1 4000 "PATTERN=1111111111111111"')   
 ```
